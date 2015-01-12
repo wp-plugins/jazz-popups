@@ -62,6 +62,13 @@ It won't work, by default Jazz pop up takes only 480px width for video and adjus
 
 == Changelog ==
 
+1.4.0 (01-12-2015)
+*Added ability to control pop up width. 
+*Added ability for the users to exclude specific pages and posts.
+*Added ability to display pop up on custom pages. 
+*Fixed bugs. 
+
+
 = 1.0 =
 * Rolled out plug-in (01-05-2015)
 

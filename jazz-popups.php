@@ -3,7 +3,7 @@
   Plugin Name: Jazz Popups
   Description: Jazz Popups allow you to add special announcement, message or offers in form of text, image and video.
   Author: <a href="http://crudlab.com/">CRUDLab</a>
-  Version: 1.0.0
+  Version: 1.4.0
  */
 require_once( ABSPATH . "wp-includes/pluggable.php" );
 add_action('admin_menu', 'test_plugin_setup_menu');
@@ -28,9 +28,22 @@ function test_plugin_setup_menu() {
     }
 }
 
-add_filter('the_content', 'lightbox');
-
-function lightbox($content) {
+//add_filter('the_content', 'lightbox');
+add_filter('wp_footer', 'lightbox', 100);
+function abwb()
+{
+        wp_register_style('css2', plugins_url('/jazz-popup/jazz-popup.css', __FILE__));
+        wp_enqueue_style('css2');
+        wp_enqueue_script('jquery-ui-core', array('jquery'));
+        wp_enqueue_script('pluginscript1', plugins_url('/jazz-popup/jquery.jazz-popup.js', __FILE__), array('jquery'));
+        wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
+        wp_enqueue_script('pluginscript3', plugins_url('/js/customcookie.js', __FILE__), array('jquery'));
+        
+}
+add_action('wp_enqueue_scripts', 'abwb');
+function lightbox() {
+    $content = '';
+    $post_id = get_the_ID();
     global $wpdb;
     $table = $wpdb->prefix . 'notify';
     $myrows = $wpdb->get_results("SELECT * FROM $table WHERE id = 1");
@@ -40,12 +53,17 @@ function lightbox($content) {
     $display = $myrows[0]->display;
     $user = $myrows[0]->user;
     $when_display = $myrows[0]->when_display;
+    $except_ids = $myrows[0]->except_ids;
     $str = $content;
+    $width = $myrows[0]->width . 'px';
     if ($status == 0) {
         $str = $content;
     } else {
         if ($type == 1) {
             $type = 'image';
+            if($myrows[0]->width > 0){
+                echo '<style>img.mfp-img{width:'.$width.';}</style>';
+            }
         } else {
             $type = 'inline';
         }
@@ -53,7 +71,7 @@ function lightbox($content) {
         if ($myrows[0]->type == 2) {
             $background = 'none';
         }
-        $width = $myrows[0]->width . 'px';
+        
         $position = 'z-index: 9999999;position: fixed;';
         $animation = 'none';
         $remove = 'false';
@@ -85,14 +103,8 @@ function lightbox($content) {
         if ($myrows[0]->remove == 2 || $myrows[0]->remove == 3) {
             $remove = 'true';
         }
-        wp_register_style('css2', plugins_url('/jazz-popup/jazz-popup.css', __FILE__));
-        wp_enqueue_style('css2');
-        wp_enqueue_script('jquery-ui-core', array('jquery'));
-        wp_enqueue_script('pluginscript1', plugins_url('/jazz-popup/jquery.jazz-popup.js', __FILE__), array('jquery'));
-        wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
-        wp_enqueue_script('pluginscript3', plugins_url('/js/customcookie.js', __FILE__), array('jquery'));
         
-        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="background:' . $background . '">' . $data . '</div>';
+        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="background:' . $background . '; max-width:'.$width.'">' . $data . '</div>';
         if ($type != 'image') {
             $data = '#test-popup';
         }
@@ -116,6 +128,9 @@ function lightbox($content) {
                     $str = $content . $lightbox;
                 }
             }
+            if ($display == 4 && is_user_logged_in()) {
+                    $str = $content . $lightbox;
+            }
         }
         if ($user == 2) {
             if ($display == 3 && !is_user_logged_in()) {
@@ -130,6 +145,9 @@ function lightbox($content) {
                 if (is_single()) {
                     $str = $content . $lightbox;
                 }
+            }
+            if ($display == 4 && is_user_logged_in()) {
+                    $str = $content . $lightbox;
             }
         }
         if ($user == 3) {
@@ -146,9 +164,23 @@ function lightbox($content) {
                     $str = $content . $lightbox;
                 }
             }
+            if ($display == 4 && is_user_logged_in()) {
+                    $str = $content . $lightbox;
+            }
         }
     }
-    return $str;
+    $except_check = true;
+    if($display == 4){
+        @$expect_ids_arrays = split(',', $except_ids);
+        foreach($expect_ids_arrays as $id){
+            if(trim($id) == $post_id){
+                $except_check = false;
+            }
+        }
+    }
+    if($except_check){
+      echo $str;  
+    }
 }
 
 if (isset($_REQUEST['notify_save'])) {
@@ -222,6 +254,7 @@ if (isset($_REQUEST['notify_update'])) {
     $when_display = @mysql_real_escape_string($_REQUEST['when_display']);
     $remove = @mysql_real_escape_string($_REQUEST['remove']);
     $edit_id = @mysql_real_escape_string($_REQUEST['update_id']);
+    $except_ids = @mysql_real_escape_string($_REQUEST['except_ids']);
     $ul = '0';
     global $current_user;
     get_currentuserinfo();
@@ -262,7 +295,8 @@ if (isset($_REQUEST['notify_update'])) {
         'animation' => $animation,
         'when_display' => $when_display,
         'remove' => $remove,
-        'user_id' => $user_id
+        'user_id' => $user_id,
+        'except_ids' => $except_ids    
     );
     $v = $wpdb->update($table, $data1, array('id' => $edit_id));
     header('Location:' . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
@@ -610,12 +644,20 @@ function test_init() {
                                                                 <div class="field-wrap">
                                                                     <label>Where would you like to display: </label>
                                                                     <div class="form-group">
-                                                                        <select class="form-control" name="display">
+                                                                        <select class="form-control" name="display" onchange="if(this.value == 4){jQuery('#page-ids').show(200)}else{jQuery('#page-ids').hide(200)}">
                                                                             <option value="2" <?php echo @$display[2]; ?>>Homepage</option>
                                                                             <option value="1" <?php echo @$display[1]; ?>>All other pages except Homepage</option>
                                                                             <option value="3" <?php echo @$display[3]; ?>>All Pages</option>
+                                                                            <option value="4" <?php echo @$display[4]; ?>>All Pages except followings</option>
                                                                         </select>
                                                                     </div>
+                                                                </div>
+                                                                <div class="field-wrap" id="page-ids" style="display:<?php if($myrows[0]->display != 4){echo 'none';} ?>;">
+                                                                    <label style="width:280px;">add page/post ids seperated by comma.</label>
+                                                                    <div class="form-group">
+                                                                        <input type="text" name="except_ids" value="<?php echo $myrows[0]->except_ids; ?>" class="form-control">
+                                                                    </div>
+                                                                    <label class="small" style="margin-top: -6px;font-size: 10px;margin-left: 8px;"> Example: 1,9,14 </label>
                                                                 </div>
                                                                 <div class="field-wrap">
                                                                     <label>Logged in or Non Logged in user: </label>
@@ -627,6 +669,7 @@ function test_init() {
                                                                         </select>
                                                                     </div>
                                                                 </div>
+                                                               
                                                                 <div class="field-wrap">
 
 
@@ -641,11 +684,11 @@ function test_init() {
                                                                                 <label>Background Color:</label>
                                                                                 <input id="wp-background" name="bg_color" value="<?php echo $myrows[0]->bg_color; ?>" type="color" class="form-control" style="cursor:pointer">
                                                                             </div>
-                                                                            <?php /* ?> <div class="inner-field">
-                                                                              <label>Announcement Width:</label>
+                                                                             <div class="inner-field">
+                                                                              <label>Popup Width:</label>
                                                                               <input id="wp-width" name="width" value="<?php echo $myrows[0]->width; ?>" type="text" class="form-control">
                                                                               </div>
-                                                                              <div class="inner-field">
+                                                                              <?php /* ?><div class="inner-field">
                                                                               <label>Announcement Position:</label>
                                                                               <select class="form-control" name="position" id="wp-position">
                                                                               <option <?php echo $position[1]; ?> value="1">Top</option>
@@ -751,6 +794,7 @@ function test_init() {
                 status int, 
                 user_id int,
                 active int,
+                except_ids varchar(255),
 		created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		last_modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 		UNIQUE KEY id (id)
@@ -765,8 +809,8 @@ function test_init() {
                                         function jal_install_data() {
                                             global $wpdb;
 
-                                            $type = '3';
-                                            $radio_value = 'all';
+                                            $type = '0';
+                                            $radio_value = 'text';
                                             $data = 'Congratulations, you just completed the installation. Welcome to Jazz Popup!';
 
                                             $table_name = $wpdb->prefix . 'notify';
@@ -793,11 +837,12 @@ function test_init() {
                                                     'display' => 3,
                                                     'user' => 3,
                                                     'bg_color' => '#ffffff',
-                                                    'width' => 450,
+                                                    'width' => 500,
                                                     'position' => 3,
                                                     'animation' => 2,
                                                     'when_display' => 0,
                                                     'remove' => 3,
+                                                    'except_ids' => '',        
                                                     'user_id' => $user_id,
                                                     'active' => 1
                                                         )

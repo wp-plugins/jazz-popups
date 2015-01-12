@@ -139,6 +139,7 @@ jQuery(document).ready(function($){
                 }
 
                 jQuery('#test-popup').css('background', tmp_background);
+                jQuery('#test-popup').css('max-width', tmp_width+'px');
                 console.log(content);
                 if (content == null || content == '' || content == '<p><br data-mce-bogus="1"></p>' || content == 'http://') {
                     alert('There is no content to display');
