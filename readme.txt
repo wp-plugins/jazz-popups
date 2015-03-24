@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: amirk27
-Donate link: http://crudlab.com
+Donate link: https://www.2checkout.com/checkout/purchase?sid=102444448&quantity=1&product_id=1
 Tags: Popups, Pop-ups, welcome message, special message, custom popups, image box, video message, alertbox, alert, offer, offer, announcement, announcement box, alert box, special message, homepage box, help message, guide box, 
 Requires at least: 4.1
 Tested up to: 4.1
