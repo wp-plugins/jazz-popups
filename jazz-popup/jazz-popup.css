@@ -147,6 +147,7 @@ button::-moz-focus-inner {
   padding-right: 6px;
   width: 100%; }
 
+
 .mfp-counter {
   position: absolute;
   top: 0;
@@ -244,7 +245,7 @@ img.mfp-img {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  padding: 40px 0 40px;
+  /*padding: 40px 0 40px;*/
   margin: 0 auto; }
 
 /* The shadow behind the image */
@@ -641,4 +642,11 @@ img.mfp-img {
 }
 .mfp-with-fade.mfp-removing.mfp-bg {
   opacity: 0;
+}
+
+.jazzclosebutton{
+        top: -15px;
+        right: -15px;
+        position: absolute;
+        cursor: pointer;
 }

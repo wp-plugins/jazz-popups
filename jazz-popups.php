@@ -3,7 +3,7 @@
   Plugin Name: Jazz Popups
   Description: Jazz Popups allow you to add special announcement, message or offers in form of text, image and video.
   Author: <a href="http://crudlab.com/">CRUDLab</a>
-  Version: 1.4.0
+  Version: 1.4.2
  */
 require_once( ABSPATH . "wp-includes/pluggable.php" );
 add_action('admin_menu', 'test_plugin_setup_menu');
@@ -36,7 +36,7 @@ function abwb()
         wp_enqueue_style('css2');
         wp_enqueue_script('jquery-ui-core', array('jquery'));
         wp_enqueue_script('pluginscript1', plugins_url('/jazz-popup/jquery.jazz-popup.js', __FILE__), array('jquery'));
-        wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
+        //wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
         wp_enqueue_script('pluginscript3', plugins_url('/js/customcookie.js', __FILE__), array('jquery'));
         
 }
@@ -54,8 +54,10 @@ function lightbox() {
     $user = $myrows[0]->user;
     $when_display = $myrows[0]->when_display;
     $except_ids = $myrows[0]->except_ids;
+    $seconds =  $myrows[0]->time;
     $str = $content;
     $width = $myrows[0]->width . 'px';
+    $time_query = ($seconds > 0)?' setTimeout( "jQuery.jazzPopup.close()",'.($seconds*1000).' ); ':'';
     if ($status == 0) {
         $str = $content;
     } else {
@@ -104,14 +106,15 @@ function lightbox() {
             $remove = 'true';
         }
         
-        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="background:' . $background . '; max-width:'.$width.'">' . $data . '</div>';
+        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="background:' . $background . '; max-width:'.$width.'">' . $data . '<img class="jazzclosebutton" src="'.plugins_url("/images/crox.png", __FILE__).'" onclick="jQuery.jazzPopup.close();"></div>';
         if ($type != 'image') {
             $data = '#test-popup';
         }
         if ($when_display == 0) {
-            $lightbox .= '<script>jQuery(document).ready(function () {jQuery.jazzPopup.open({ items: { src: "' . $data . '" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  });  });</script>';
+            
+            $lightbox .= '<script>jQuery(document).ready(function () {jQuery.jazzPopup.open({ items: { src: "' . $data . '", crox: "'.plugins_url("/images/crox.png", __FILE__).'" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  }); '.$time_query.'  });</script>';
         } else {
-            $lightbox .= '<script>jQuery(document).ready(function () {if(checkCookie()){jQuery.jazzPopup.open({ items: { src: "' . $data . '" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  });}})</script>';
+            $lightbox .= '<script>jQuery(document).ready(function () {if(checkCookie()){jQuery.jazzPopup.open({ items: { src: "' . $data . '" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  }); '.$time_query.' }})</script>';
         }
         
         if ($user == 1) {
@@ -255,6 +258,7 @@ if (isset($_REQUEST['notify_update'])) {
     $remove = @mysql_real_escape_string($_REQUEST['remove']);
     $edit_id = @mysql_real_escape_string($_REQUEST['update_id']);
     $except_ids = @mysql_real_escape_string($_REQUEST['except_ids']);
+    $seconds = @mysql_real_escape_string($_REQUEST['seconds']);
     $ul = '0';
     global $current_user;
     get_currentuserinfo();
@@ -296,6 +300,7 @@ if (isset($_REQUEST['notify_update'])) {
         'when_display' => $when_display,
         'remove' => $remove,
         'user_id' => $user_id,
+        'time' => $seconds,
         'except_ids' => $except_ids    
     );
     $v = $wpdb->update($table, $data1, array('id' => $edit_id));
@@ -572,7 +577,6 @@ function test_init() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
                                             <?php }if ($_REQUEST['notify'] == 'video') {
                                                 ?>
                                                 <form method="post" action=""  enctype="multipart/form-data">  
@@ -726,6 +730,12 @@ function test_init() {
                                                                     </div>
                                                                 </div>
                                                                 <div class="field-wrap">
+                                                                    <label style="width:100%">Automatically close pop up after how many seconds?</label>
+                                                                    <div class="form-group">
+                                                                        <input type="text" value="<?php echo $myrows[0]->time; ?>" name="seconds" class="form-control">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="field-wrap">
                                                                     <label>User can remove announcement </label>
                                                                     <div class="form-group">
                                                                         <select class="form-control" name="remove" id="wp-remove">
@@ -758,7 +768,7 @@ function test_init() {
 
 //-------------------------------------- database --------------------
                                         global $jal_db_version;
-                                        $jal_db_version = '1.0';
+                                        $jal_db_version = '1';
 
                                         function jal_install() {
                                             global $wpdb;
@@ -790,6 +800,7 @@ function test_init() {
                 position int,
                 animation int,
                 when_display int,
+                time int,
                 remove int, 
                 status int, 
                 user_id int,
@@ -805,6 +816,16 @@ function test_init() {
 
                                             add_option('jal_db_version', $jal_db_version);
                                         }
+                                        
+        function jazzpopup_update_db_check() {
+    global $jal_db_version;
+    if (get_site_option('jal_db_version') != $jal_db_version) {
+        jazzpopup_update_db_check();
+    }
+}
+
+//add_action('plugins_loaded', 'jazzpopup_update_db_check');                                
+                                        
 
                                         function jal_install_data() {
                                             global $wpdb;
@@ -839,6 +860,7 @@ function test_init() {
                                                     'bg_color' => '#ffffff',
                                                     'width' => 500,
                                                     'position' => 3,
+                                                    'time' => 6000,        
                                                     'animation' => 2,
                                                     'when_display' => 0,
                                                     'remove' => 3,

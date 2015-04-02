@@ -3,8 +3,8 @@ Contributors: amirk27
 Donate link: https://www.2checkout.com/checkout/purchase?sid=102444448&quantity=1&product_id=1
 Tags: Popups, Pop-ups, welcome message, special message, custom popups, image box, video message, alertbox, alert, offer, offer, announcement, announcement box, alert box, special message, homepage box, help message, guide box, 
 Requires at least: 4.1
-Tested up to: 4.1
-Stable tag: 4.3
+Tested up to: 3.5
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,12 @@ It won't work, by default Jazz pop up takes only 480px width for video and adjus
 
 
 == Changelog ==
+
+= 1.4.3 =
+* Added popup closing time. Now you can specify how long pop should remain open
+* Improved popup styling along with cross icon.
+* Made it compatible with older Wordpress versions (Till 3.5)
+
 
 = 1.4.0 =
 * Added ability to control pop up width. 

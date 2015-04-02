@@ -12,7 +12,7 @@ if (typeof define === 'function' && define.amd) {
  } 
  }(function($) { 
 
-
+var crox;
 /**
  * Private static constants
  */
@@ -146,7 +146,6 @@ JazzPopup.prototype = {
 		if(data.isObj === false) { 
 			// convert jQuery collection to array to avoid conflicts later
 			mfp.items = data.items.toArray();
-
 			mfp.index = 0;
 			var items = data.items,
 				item;
@@ -163,6 +162,7 @@ JazzPopup.prototype = {
 		} else {
 			mfp.items = $.isArray(data.items) ? data.items : [data.items];
 			mfp.index = data.index || 0;
+                        console.log(mfp.items[0].crox);
 		}
 
 		// if popup is already opened - we just update the content
@@ -551,7 +551,7 @@ JazzPopup.prototype = {
 	parseEl: function(index) {
 		var item = mfp.items[index],
 			type;
-
+                crox = item.crox;
 		if(item.tagName) {
 			item = { el: $(item) };
 		} else {
@@ -821,7 +821,6 @@ $.jazzPopup = {
 			options = $.extend(true, {}, options);
 		}
 			
-
 		options.isObj = true;
 		options.index = index || 0;
 		return this.instance.open(options);
@@ -859,7 +858,7 @@ $.jazzPopup = {
 
 		closeBtnInside: true, 
 
-		showCloseBtn: true,
+		showCloseBtn: false,
 
 		enableEscapeKey: true,
 
@@ -1146,8 +1145,9 @@ $.jazzPopup.registerModule('image', {
 								'<div class="mfp-counter"></div>'+
 							'</div>'+
 						'</figcaption>'+
-					'</figure>'+
-				'</div>',
+					'</figure>'+'<img class="jazzclosebutton" id="jazz-cross-icon" src="" onclick="jQuery.jazzPopup.close();">'+
+				'</div>'
+                               ,
 		cursor: 'mfp-zoom-out-cur',
 		titleSrc: 'title', 
 		verticalFit: true,
@@ -1312,6 +1312,9 @@ $.jazzPopup.registerModule('image', {
 				}
 				item.img = $(img).on('load.mfploader', onLoadComplete).on('error.mfploader', onLoadError);
 				img.src = item.src;
+                                var mg = template.find('#jazz-cross-icon');
+                                
+                                mg.attr("src", crox);
 
 				// without clone() "error" event is not firing when IMG is replaced by new IMG
 				// TODO: find a way to avoid such cloning
