@@ -3,8 +3,8 @@ Contributors: amirk27
 Donate link: https://www.2checkout.com/checkout/purchase?sid=102444448&quantity=1&product_id=1
 Tags: Popups, Pop-ups, welcome message, special message, custom popups, image box, video message, alertbox, alert, offer, offer, announcement, announcement box, alert box, special message, homepage box, help message, guide box, 
 Requires at least: 3.5
-Tested up to: 4.1
-Stable tag: 1.4.3
+Tested up to: 4.2
+Stable tag: 1.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,19 @@ Jazz Popups allow you to add special announcements, messages, tips, offers on yo
 * Ability to display popup for both logged in or non logged in users;
 * Works with any WordPress theme;
 * ON/OFF Indication
+
+> <strong> Docs & Support </strong> 
+
+> You can find [docs](http://bit.ly/1Ico5dp), [FAQ](https://wordpress.org/plugins/jazz-popups/faq/) and more detailed information about WP Like Button on [CRUDLab.com](http://crudlab.com/). If you were unable to find the answer to your question on the FAQ or in any of the documentation, you should check the [support forum](https://wordpress.org/plugins/jazz-popups/) on WordPress.org. If you can't locate any topics that pertain to your particular issue, post a new topic for it
+
+> <strong> Recommended Plugins </strong>
+
+> The following are other recommended plugins by the author of WP Like Button.
+
+> * [CRUDLab Facebook Like Box](https://wordpress.org/plugins/crudlab-facebook-like-box/) - CRUDLab Facebook Like Box allows you to add Facebook like box to your wordpress blog. 
+> * [WP Tweet Plus](https://wordpress.org/plugins/wp-tweet-plus/) - WP Tweet Plus allows you to add tweet button on your wordpress blog. You can add tweet Button homepage, specific pages and posts.
+> * [CRUDLab Google Plus Button](https://wordpress.org/plugins/crudlab-google-plus/) - CRUDLab Google Plus button let visitors recommend your content on Google Search and share it on Google+.
+> * [WP Like Button](https://wordpress.org/plugins/wp-like-button/) - WP Like button allows you to add Facebook like button on your wordpress blog.
 
 == Installation ==
 
@@ -61,6 +74,9 @@ It won't work, by default Jazz pop up takes only 480px width for video and adjus
 
 
 == Changelog ==
+
+= 1.4.4 =
+* Fixed "WSIWYG editor changes not being saved"
 
 = 1.4.3 =
 * Added popup closing time. Now you can specify how long pop should remain open
