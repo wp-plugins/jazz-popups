@@ -39,30 +39,83 @@ jQuery(document).ready(function($){
  
 });
 //----------------------------------------------------
+jQuery(document).ready(function ($) {
+    var current_url = window.location;
+    var loc = window.location.href,
+            index = loc.indexOf('#');
 
- function switchonoff() {
-            var on = jQuery('#on').is(':checked')
-            var off = jQuery('#off').is(':checked')
-            if (on)
-            {
-                jQuery.post('', {'switchonoff': 1}, function (e) {
-                    if (e == 'error') {
-                        error('error');
-                    } else {
-                        jQuery('#jazz_circ').css("background", "#0f0");
-                    }
-                });
-            } if(off) {
-                jQuery.post('', {'switchonoff': 0}, function (e) {
-                    if (e == 'error') {
-                        error('error');
-                    } else {
-                        jQuery('#jazz_circ').css("background", "#f00");
-                    }
-                });
+    if (index > 0) {
+        current_url = loc.substring(0, index);
+    }
+    var magic_url = current_url + '&jazzpopup_magic_data=1';
+    console.log(magic_url);
+    $('#magicsuggest').magicSuggest({
+        data: magic_url ,
+        ajaxConfig: {
+            xhrFields: {
+                withCredentials: true,
             }
-            //alert(val);
         }
+    });
+//    jQuery( document ).tooltip({
+//        content: function() {
+//        var element = $( this );
+//            if ( element.is( "[help]" ) ) {
+//                return 'The Minimum width is 280px & Max is 500px';
+//            }
+//            if ( element.is( "[help1]" ) ) {
+//                return 'The Minimum height of the Like Box is 130px';
+//            }
+//        }
+//        
+//    });
+});
+
+
+jQuery(document).ready(function ($) {
+    
+    $('#magicsuggest').magicSuggest({
+        // [...] // configuration options
+    });
+});
+//----------------------------------------------------
+function wpjazzpopup_switchonoff(val) {
+    var path = jQuery(val).attr("src");
+    var file = path.split('/').pop();
+    var file2 = path.split(file);
+    console.log(file2[0]);
+    var on = '';
+    var off = '';
+    if (file == 'on.png') {
+        on = true;
+    } else {
+        off = true;
+    }
+    if (off)
+    {
+        jQuery.post('', {'wpjazzpopup_switchonoff': 1}, function (e) {
+            if (e == 'error') {
+                error('error');
+            } else {
+                jQuery('#jazz_circ').css("background", "#0f0");
+                jQuery(val).attr("src", file2[0] + 'on.png');
+            }
+        });
+    }
+    if (on) {
+        jQuery.post('', {'wpjazzpopup_switchonoff': 0}, function (e) {
+            if (e == 'error') {
+                error('error');
+            } else {
+                jQuery('#jazz_circ').css("background", "#f00");
+                jQuery(val).attr("src", file2[0] + 'off.png');
+            }
+        });
+    }
+    //alert(val);
+}
+//----------------------------------------------------
+
 //        jQuery(document).ready(function () {
 //            jQuery("input[type=checkbox]").switchButton({
 //                width: 80,

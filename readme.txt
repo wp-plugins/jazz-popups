@@ -4,7 +4,7 @@ Donate link: https://www.2checkout.com/checkout/purchase?sid=102444448&quantity=
 Tags: Popups, Pop-ups, welcome message, special message, custom popups, image box, video message, alertbox, alert, offer, offer, announcement, announcement box, alert box, special message, homepage box, help message, guide box, 
 Requires at least: 3.5
 Tested up to: 4.2
-Stable tag: 1.4.4
+Stable tag: 1.6.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,7 @@ Jazz Popups allow you to add special announcements, messages, tips, offers on yo
 
 > <strong> Docs & Support </strong> 
 
-> You can find [docs](http://bit.ly/1Ico5dp), [FAQ](https://wordpress.org/plugins/jazz-popups/faq/) and more detailed information about WP Like Button on [CRUDLab.com](http://crudlab.com/). If you were unable to find the answer to your question on the FAQ or in any of the documentation, you should check the [support forum](https://wordpress.org/plugins/jazz-popups/) on WordPress.org. If you can't locate any topics that pertain to your particular issue, post a new topic for it
+> You can find [docs](http://bit.ly/1Ico5dp), [FAQ](https://wordpress.org/plugins/jazz-popups/faq/) and more detailed information about WP Like Button on [CRUDLab.com](http://crudlab.com/). If you were unable to find the answer to your question on the [FAQ](https://wordpress.org/plugins/jazz-popups/faq/) or in any of the documentation, please submit ticket [[here](https://crudlab.com/submit-ticket/)].
 
 > <strong> Recommended Plugins </strong>
 
@@ -74,6 +74,12 @@ It won't work, by default Jazz pop up takes only 480px width for video and adjus
 
 
 == Changelog ==
+
+= 1.6.6 = 
+* Improved "where to display" option. 
+* Added Switch for ON/OFF popup.
+* Added Support and FAQ links
+* Fixed few bugs.
 
 = 1.4.4 =
 * Fixed "WSIWYG editor changes not being saved"

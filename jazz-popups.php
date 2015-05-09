@@ -3,12 +3,35 @@
   Plugin Name: Jazz Popups
   Description: Jazz Popups allow you to add special announcement, message or offers in form of text, image and video.
   Author: <a href="http://crudlab.com/">CRUDLab</a>
-  Version: 1.4.4
+  Version: 1.6.6
  */
 require_once( ABSPATH . "wp-includes/pluggable.php" );
 add_action('admin_menu', 'test_plugin_setup_menu');
 //register_uninstall_hook( __FILE__, 'uninstall_hook');
 register_deactivation_hook(__FILE__, 'uninstall_hook');
+
+function jazzpopup_box_settings_link($links) { 
+  $settings_link = '<a href="admin.php?page=jazz-plugin&edit=1">Settings</a>'; 
+  array_unshift($links, $settings_link); 
+  return $links; 
+}
+ 
+$plugin = plugin_basename(__FILE__); 
+add_filter("plugin_action_links_$plugin", 'jazzpopup_box_settings_link' );
+
+if ( ! function_exists ( 'jazzpopup_links' ) ) {
+	function jazzpopup_links( $links, $file ) {
+		$base = plugin_basename( __FILE__ );
+		if ( $file == $base ) {
+			if ( ! is_network_admin() )
+				$links[] = '<a href="admin.php?page=jazz-plugin&edit=1">' . __( 'Settings') . '</a>';
+                                $links[] = '<a href="https://wordpress.org/plugins/jazz-popups/faq/" target="_blank">' . __( 'FAQ' ) . '</a>';
+                                $links[] = '<a href="https://crudlab.com/submit-ticket/" target="_blank">' . __( 'Support' ) . '</a>';
+		}
+		return $links;
+	}
+}
+add_filter( 'plugin_row_meta', 'jazzpopup_links', 10, 2 );
 
 function uninstall_hook() {
     global $wpdb;
@@ -24,24 +47,26 @@ function test_plugin_setup_menu() {
     if ($myrows[0]->status == 0) {
         add_menu_page('Jazz Popups', 'Jazz Popups <span id="jazz_circ" class="update-plugins count-1" style="background:#F00"><span class="plugin-count">&nbsp&nbsp</span></span>', 'manage_options', 'jazz-plugin', 'test_init', plugins_url("/images/ico.png", __FILE__));
     } else {
-        add_menu_page('Jazz Popups', 'Jazz Popups <span id="jazz_circ" class="update-plugins count-1" style="background:#0F0"><span class="plugin-count">&nbsp&nbsp</span></span>', 'manage_options', 'jazz-plugin', 'test_init', plugins_url( "/images/ico.png", __FILE__));
+        add_menu_page('Jazz Popups', 'Jazz Popups <span id="jazz_circ" class="update-plugins count-1" style="background:#0F0"><span class="plugin-count">&nbsp&nbsp</span></span>', 'manage_options', 'jazz-plugin', 'test_init', plugins_url("/images/ico.png", __FILE__));
     }
 }
 
 //add_filter('the_content', 'lightbox');
 add_filter('wp_footer', 'lightbox', 100);
-function abwb()
-{
-        wp_register_style('css2', plugins_url('/jazz-popup/jazz-popup.css', __FILE__));
-        wp_enqueue_style('css2');
-        wp_enqueue_script('jquery-ui-core', array('jquery'));
-        wp_enqueue_script('pluginscript1', plugins_url('/jazz-popup/jquery.jazz-popup.js', __FILE__), array('jquery'));
-        //wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
-        wp_enqueue_script('pluginscript3', plugins_url('/js/customcookie.js', __FILE__), array('jquery'));
-        
+
+function abwb() {
+    wp_register_style('css2', plugins_url('/jazz-popup/jazz-popup.css', __FILE__));
+    wp_enqueue_style('css2');
+    wp_enqueue_script('jquery-ui-core', array('jquery'));
+    wp_enqueue_script('pluginscript1', plugins_url('/jazz-popup/jquery.jazz-popup.js', __FILE__), array('jquery'));
+    //wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
+    wp_enqueue_script('pluginscript3', plugins_url('/js/customcookie.js', __FILE__), array('jquery'));
 }
+
 add_action('wp_enqueue_scripts', 'abwb');
+
 function lightbox() {
+    
     $content = '';
     $post_id = get_the_ID();
     global $wpdb;
@@ -54,26 +79,26 @@ function lightbox() {
     $user = $myrows[0]->user;
     $when_display = $myrows[0]->when_display;
     $except_ids = $myrows[0]->except_ids;
-    $seconds =  $myrows[0]->time;
+    $seconds = $myrows[0]->time;
     $str = $content;
     $width = $myrows[0]->width . 'px';
-    $time_query = ($seconds > 0)?' setTimeout( "jQuery.jazzPopup.close()",'.($seconds*1000).' ); ':'';
+    $time_query = ($seconds > 0) ? ' setTimeout( "jQuery.jazzPopup.close()",' . ($seconds * 1000) . ' ); ' : '';
     if ($status == 0) {
         $str = $content;
     } else {
         if ($type == 1) {
             $type = 'image';
-            if($myrows[0]->width > 0){
-                echo '<style>img.mfp-img{width:'.$width.';}</style>';
+            if ($myrows[0]->width > 0) {
+                echo '<style>img.mfp-img{width:' . $width . ';}</style>';
             }
         } else {
             $type = 'inline';
-        }
+    }}
         $background = $myrows[0]->bg_color;
         if ($myrows[0]->type == 2) {
             $background = 'none';
         }
-        
+
         $position = 'z-index: 9999999;position: fixed;';
         $animation = 'none';
         $remove = 'false';
@@ -105,85 +130,149 @@ function lightbox() {
         if ($myrows[0]->remove == 2 || $myrows[0]->remove == 3) {
             $remove = 'true';
         }
-        
-        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="background:' . $background . '; max-width:'.$width.'">' . $data . '<img class="jazzclosebutton" src="'.plugins_url("/images/crox.png", __FILE__).'" onclick="jQuery.jazzPopup.close();"></div>';
+
+        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="background:' . $background . '; max-width:' . $width . '">' . $data . '<img class="jazzclosebutton" src="' . plugins_url("/images/crox.png", __FILE__) . '" onclick="jQuery.jazzPopup.close();"></div>';
         if ($type != 'image') {
             $data = '#test-popup';
         }
         if ($when_display == 0) {
-            
-            $lightbox .= '<script>jQuery(document).ready(function () {jQuery.jazzPopup.open({ items: { src: "' . $data . '", crox: "'.plugins_url("/images/crox.png", __FILE__).'" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  }); '.$time_query.'  });</script>';
+
+            $lightbox .= '<script>jQuery(document).ready(function () {jQuery.jazzPopup.open({ items: { src: "' . $data . '", crox: "' . plugins_url("/images/crox.png", __FILE__) . '" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  }); ' . $time_query . '  });</script>';
         } else {
-            $lightbox .= '<script>jQuery(document).ready(function () {if(checkCookie()){jQuery.jazzPopup.open({ items: { src: "' . $data . '" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  }); '.$time_query.' }})</script>';
+            $lightbox .= '<script>jQuery(document).ready(function () {if(checkCookie()){jQuery.jazzPopup.open({ items: { src: "' . $data . '" }, type: "' . $type . '", removalDelay: 500,closeOnBgClick: ' . $remove . ', callbacks: {beforeOpen: function() {this.st.image.markup = this.st.image.markup.replace("mfp-figure", "mfp-figure mfp-with-anim");this.st.mainClass = "' . $animation . '" ;}}  }); ' . $time_query . ' }})</script>';
         }
         
-        if ($user == 1) {
-            if ($display == 3 && is_user_logged_in()) {
-                $str = $content . $lightbox;
-            }
-            if ($display == 2 && is_user_logged_in()) {
-                if (is_front_page()) {
-                    $str = $content . $lightbox;
-                }
-            }
-            if ($display == 1 && is_user_logged_in()) {
-                if (is_single()) {
-                    $str = $content . $lightbox;
-                }
-            }
-            if ($display == 4 && is_user_logged_in()) {
-                    $str = $content . $lightbox;
-            }
+        if ($status == 0) {
+        $str = $content;
+    } else {
+        if ($content == NULL) {
+            //$str = $lightbox;
         }
-        if ($user == 2) {
-            if ($display == 3 && !is_user_logged_in()) {
-                $str = $content . $lightbox;
+        echo "userrrrrrrrrr".$user;
+        if (($user == 0 && is_user_logged_in()) || ($user == 1 && !is_user_logged_in()) || $user == 2) {
+            
+            if ($display & 2) {
+                if (is_page() && !defined('is_front_page')) {
+                    $str = $content . $lightbox;
+                }
             }
-            if ($display == 2 && !is_user_logged_in()) {
+            if ($display & 1) {
                 if (is_front_page()) {
                     $str = $content . $lightbox;
                 }
             }
-            if ($display == 1 && !is_user_logged_in()) {
+            if ($display & 4) {
                 if (is_single()) {
                     $str = $content . $lightbox;
                 }
             }
-            if ($display == 4 && is_user_logged_in()) {
-                    $str = $content . $lightbox;
-            }
-        }
-        if ($user == 3) {
-            if ($display == 3) {
-                $str = $content . $lightbox;
-            }
-            if ($display == 2) {
-                if (is_front_page()) {
-                    $str = $content . $lightbox;
-                }
-            }
-            if ($display == 1) {
-                if (is_single()) {
-                    $str = $content . $lightbox;
-                }
-            }
-            if ($display == 4 && is_user_logged_in()) {
-                    $str = $content . $lightbox;
+            if ($display & 8) {
+                //$str = $content . $fb;
             }
         }
     }
     $except_check = true;
-    if($display == 4){
+    if ($display & 8) {
         @$expect_ids_arrays = split(',', $except_ids);
-        foreach($expect_ids_arrays as $id){
-            if(trim($id) == $post_id){
+        foreach ($expect_ids_arrays as $id) {
+            if (trim($id) == $post_id) {
                 $except_check = false;
             }
         }
     }
-    if($except_check){
-      echo $str;  
+    
+   
+    if ($except_check) {
+        echo $str;
+    } else {
+        echo $content;
     }
+        
+        
+
+//        if ($user == 1) {
+//            if ($display == 3 && is_user_logged_in()) {
+//                $str = $content . $lightbox;
+//            }
+//            if ($display == 2 && is_user_logged_in()) {
+//                if (is_front_page()) {
+//                    $str = $content . $lightbox;
+//                }
+//            }
+//            if ($display == 1 && is_user_logged_in()) {
+//                if (is_single()) {
+//                    $str = $content . $lightbox;
+//                }
+//            }
+//            if ($display == 4 && is_user_logged_in()) {
+//                $str = $content . $lightbox;
+//            }
+//        }
+//        if ($user == 2) {
+//            if ($display == 3 && !is_user_logged_in()) {
+//                $str = $content . $lightbox;
+//            }
+//            if ($display == 2 && !is_user_logged_in()) {
+//                if (is_front_page()) {
+//                    $str = $content . $lightbox;
+//                }
+//            }
+//            if ($display == 1 && !is_user_logged_in()) {
+//                if (is_single()) {
+//                    $str = $content . $lightbox;
+//                }
+//            }
+//            if ($display == 4 && is_user_logged_in()) {
+//                $str = $content . $lightbox;
+//            }
+//        }
+//        if ($user == 3) {
+//            if ($display == 3) {
+//                $str = $content . $lightbox;
+//            }
+//            if ($display == 2) {
+//                if (is_front_page()) {
+//                    $str = $content . $lightbox;
+//                }
+//            }
+//            if ($display == 1) {
+//                if (is_single()) {
+//                    $str = $content . $lightbox;
+//                }
+//            }
+//            if ($display == 4 && is_user_logged_in()) {
+//                $str = $content . $lightbox;
+//            }
+//        }
+//    }
+//    $except_check = true;
+//    if ($display == 4) {
+//        @$expect_ids_arrays = split(',', $except_ids);
+//        foreach ($expect_ids_arrays as $id) {
+//            if (trim($id) == $post_id) {
+//                $except_check = false;
+//            }
+//        }
+//    }
+//    if ($except_check) {
+//        echo $str;
+//    }
+}
+
+if (isset($_REQUEST['jazzpopup_magic_data'])) {
+    $data = '';
+    $args = array(
+        'post_type' => 'any',
+        'post_status' => 'publish',
+        'posts_per_page' => -1
+    );
+    $posts = get_posts($args);
+    foreach ($posts as $post) {
+        $data[] = array('id' => $post->ID, 'name' => $post->post_title);
+    }
+
+    echo json_encode($data);
+    exit();
 }
 
 if (isset($_REQUEST['notify_save'])) {
@@ -246,9 +335,16 @@ if (isset($_REQUEST['notify_save'])) {
 if (isset($_REQUEST['notify_update'])) {
     global $wpdb;
     $type = '';
+    $display = $_REQUEST['display'];
+    $display_val = 0;
+    foreach ($display as $d) {
+        $display_val += @mysql_real_escape_string($d);
+    }
+    $except_ids = (isset($_REQUEST['except_ids'])) ? $_REQUEST['except_ids'] : '';
+    if ($except_ids != NULL) {
+        $except_ids = implode(', ', $except_ids);
+    }
     $radio_value = @mysql_real_escape_string($_REQUEST['notify']);
-    $status = @mysql_real_escape_string($_REQUEST['status']);
-    $display = @mysql_real_escape_string($_REQUEST['display']);
     $user = @mysql_real_escape_string($_REQUEST['user']);
     $bg_color = @mysql_real_escape_string($_REQUEST['bg_color']);
     $width = @mysql_real_escape_string($_REQUEST['width']);
@@ -257,19 +353,12 @@ if (isset($_REQUEST['notify_update'])) {
     $when_display = @mysql_real_escape_string($_REQUEST['when_display']);
     $remove = @mysql_real_escape_string($_REQUEST['remove']);
     $edit_id = @mysql_real_escape_string($_REQUEST['update_id']);
-    $except_ids = @mysql_real_escape_string($_REQUEST['except_ids']);
     $seconds = @mysql_real_escape_string($_REQUEST['seconds']);
     $ul = '0';
     global $current_user;
     get_currentuserinfo();
     if (isset($current_user)) {
         $ul = $current_user->ID;
-    }
-    if($status == 'on'){
-        $status = 1;
-    }
-    if($status == 'off'){
-        $status = 0;
     }
     $user_id = $ul;
     if ($radio_value == 'text') {
@@ -285,14 +374,13 @@ if (isset($_REQUEST['notify_update'])) {
         $type = 3;
     }
     $data = ($_REQUEST['content']);
-	$data = stripcslashes ($data);
+    $data = stripcslashes($data);
     $table = $wpdb->prefix . 'notify';
     $data1 = array(
         'type' => $type,
         'radio_value' => $radio_value,
         'data' => $data,
-        'status' => $status,
-        'display' => $display,
+        'display' => $display_val,
         'user' => $user,
         'bg_color' => $bg_color,
         'width' => $width,
@@ -302,15 +390,15 @@ if (isset($_REQUEST['notify_update'])) {
         'remove' => $remove,
         'user_id' => $user_id,
         'time' => $seconds,
-        'except_ids' => $except_ids    
+        'except_ids' => $except_ids
     );
     $v = $wpdb->update($table, $data1, array('id' => $edit_id));
     header('Location:' . $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']);
 }
 
-if (isset($_REQUEST['switchonoff'])) {
+if (isset($_REQUEST['wpjazzpopup_switchonoff'])) {
     global $wpdb;
-    $val = $_REQUEST['switchonoff'];
+    $val = $_REQUEST['wpjazzpopup_switchonoff'];
     $data = array(
         'status' => $val
     );
@@ -320,6 +408,7 @@ if (isset($_REQUEST['switchonoff'])) {
     } else {
         echo 'error';
     };
+    die;
 }
 
 if (isset($_REQUEST['trash_announce_id'])) {
@@ -378,7 +467,6 @@ function test_init() {
     }
     $data = '';
     $data_array = array();
-    $display[$myrows[0]->display] = ' selected="selected"';
     $user[$myrows[0]->user] = ' selected="selected"';
     $position[$myrows[0]->position] = ' selected="selected"';
     $animation[$myrows[0]->animation] = ' selected="selected"';
@@ -406,55 +494,68 @@ function test_init() {
         $data = @$data_array['3'];
         $setting = array('media_buttons' => true);
     }
+    if ($myrows[0]->display & 1) {
+        $display[1] = 'checked';
+    };
+    if ($myrows[0]->display & 2) {
+        $display[2] = 'checked';
+    };
+    if ($myrows[0]->display & 4) {
+        $display[4] = 'checked';
+    };
+    if ($myrows[0]->display & 8) {
+        $display[8] = 'checked';
+    };
     ?>
     <div id="test-popup" class="white-popup mfp-with-anim mfp-hide"></div>
-    <div class="container">
+    
+        <form method="post" action=""  enctype="multipart/form-data"> 
+        <div class="container">
         <div class="row">
             <div class="plugin-wrap col-md-12">
                 <div class="plugin-notify">
                     <div class="forms-wrap">
                         <div class="colmain">
                             <div class="what">
-                                <form class="inline-form form-inline"  method="get" action="" id="notify_type">
                                     <input type="hidden" name="page" value="<?php echo $_REQUEST['page']; ?>">
                                     <?php if (isset($_REQUEST['new'])) { ?>
                                         <input type="hidden" name="new" value="<?php echo $_REQUEST['new']; ?>">
                                     <?php } else if (isset($_REQUEST['edit'])) { ?>
                                         <input type="hidden" name="edit" value="<?php echo $_REQUEST['edit']; ?>">
-    <?php } ?>
+                                    <?php } ?>
+                                        
                                     <div class="control-group where">
                                         <label for="radios" class="control-label">What would you like to display?</label>
                                         <div class="controls">
                                             <div class="radios-wrap">
                                                 <label for="text" class="radio inline">
-                                                    <input type="radio" id="text"  value="text" <?php echo @$check[0]; ?> onchange="document.getElementById('notify_type').submit()" name="notify">
+                                                    <input type="radio" id="text"  value="text" <?php echo @$check[0]; ?> onchange="if(this.checked){location='?page=jazz-plugin&edit=1&notify=text';}" name="notify">
                                                     Text
                                                 </label>
                                             </div>
                                             <div class="radios-wrap">
                                                 <label for="image" class="radio inline">
-                                                    <input type="radio" id="image"  value="image" <?php echo @$check[1]; ?> onchange="document.getElementById('notify_type').submit()" name="notify">
+                                                    <input type="radio" id="image"  value="image" <?php echo @$check[1]; ?> onchange="if(this.checked){location='?page=jazz-plugin&edit=1&notify=image';}" name="notify">
                                                     Image
                                                 </label>
                                             </div>
                                             <div class="radios-wrap">
                                                 <label for="video" class="radio inline">
-                                                    <input type="radio" id="video" value="video" <?php echo @$check[2]; ?> onchange="document.getElementById('notify_type').submit()" name="notify">
+                                                    <input type="radio" id="video" value="video" <?php echo @$check[2]; ?> onchange="if(this.checked){location='?page=jazz-plugin&edit=1&notify=video';}" name="notify">
                                                     Video
                                                 </label>
                                             </div>
                                             <div class="radios-wrap">
                                                 <label for="all" class="radio inline">
-                                                    <input type="radio" id="all" value="all" <?php echo @$check[3]; ?> onchange="document.getElementById('notify_type').submit()" name="notify">
+                                                    <input type="radio" id="all" value="all" <?php echo @$check[3]; ?> onchange="if(this.checked){location='?page=jazz-plugin&edit=1&notify=all';}" name="notify">
                                                     All
                                                 </label>
                                             </div>
                                             <div class="clearfix"></div>
                                         </div>
                                     </div>
-                                </form>
                                 <div class="form-types-wrap">
-                                    <?php
+                                    <?php /*
                                     if (!isset($_REQUEST['new'])) {
                                         ?>
                                         <form method="get" action="">
@@ -463,10 +564,11 @@ function test_init() {
                                             <!--<button  type="submit" class="btn btn-info" >Create New</button>-->
                                         </form>
                                         <?php
-                                    }
+                                    } */
+                                    
                                     if ($_REQUEST['notify'] == 'text' || $_REQUEST['notify'] == 'all') {
                                         ?>
-                                        <form method="post" action=""  enctype="multipart/form-data"> 
+                                        
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h3 class="panel-title">Write Text you want to add</h3>
@@ -483,33 +585,26 @@ function test_init() {
                                                         if ($myrows[0]->id > 0) {
                                                             ?>
                                                             <input type="hidden" name="update_id" value="<?php echo $myrows[0]->id; ?>">
+                                                            
                                                             <button  name="notify_update" type="submit" class="btn btn-success">Update</button>
                                                             <?php
                                                         } else {
                                                             ?>
                                                             <button  name="notify_save" type="submit" class="btn btn-success">Save</button>
-        <?php } ?>
+                                                        <?php } ?>
                                                         <button  type="button" data-reveal-id="myModal" class="btn btn-primary">Preview</button>
                                                     </div>
-                                                    <div class="form-group pull-right col-md-5 swith">
-                                                                <div class="onoffdiv">
-                                                                    <label class="pull-left">Turn Popup on:</label>
-                                                                </div>
-                                                                    <div class="radios-wrap">
-                                                                        <label class="pull-left" for="on">Yes</label>
-                                                                        <input class="input-group pull-left" <?php if ($myrows[0]->status == 1) {echo 'checked';} ?> onchange="switchonoff();" type="radio" value="on" name="status" id="on">
-                                                                    </div>
-                                                                    <div class="radios-wrap">
-                                                                        <label class="pull-left" for="off">No</label>
-                                                                        <input class="input-group pull-left" <?php if ($myrows[0]->status == 0) {echo 'checked';} ?> onchange="switchonoff();" type="radio" value="off" name="status" id="off">
-                                                                    </div>
-                                                                <!--div class="switch" id="basic">
-                                                                    <input type="checkbox" id='switchbutton' onchange="switchonoff();" name="status" value="1" <?php
-                                                                    if ($myrows[0]->status == 1) {
-                                                                        echo 'checked';
-                                                                    }
-                                                                    ?>-->
-                                                                </div>
+                                                    <div class="wpfblbox_form-group wpfblbox_switch" style="float: right;">
+        <?php
+        $img = '';
+        if ($myrows[0]->status == 0) {
+            $img = 'off.png';
+        } else {
+            $img = 'on.png';
+        }
+        ?>
+                                                                <img onclick="wpjazzpopup_switchonoff(this)" src="<?php echo plugins_url('/images/' . $img, __FILE__); ?>"> 
+                                                            </div>
                                                 </div>
 
                                             </div>
@@ -523,7 +618,6 @@ function test_init() {
                                                 $image = '<div class"col-md-2 pull-right" style="margin-top:15px; margin-bottom:15px;"><image style="width:150px" src = "' . $value . '"></div>';
                                             }
                                             ?>
-                                            <form method="post" action=""  enctype="multipart/form-data"> 
                                                 <div class="panel panel-default">
                                                     <div class="panel-heading">
                                                         <h3 class="panel-title">Add image you want to display</h3>
@@ -531,9 +625,9 @@ function test_init() {
                                                     <div class="panel-body">
                                                         <div class="col" style="width:100%">
                                                             <label for="">Upload Image</label>
-                                                            <?php
-                                                            echo '<div class"col-md-2 pull-right" style="margin-top:15px; margin-bottom:15px;"><image id="myimage" style="width:150px" src = "' . $value . '" onError="this.onerror=null;this.src=\'' . plugins_url("/images/no-image.png", __FILE__).'\'; "></div>';
-                                                            ?>
+        <?php
+        echo '<div class"col-md-2 pull-right" style="margin-top:15px; margin-bottom:15px;"><image id="myimage" style="width:150px" src = "' . $value . '" onError="this.onerror=null;this.src=\'' . plugins_url("/images/no-image.png", __FILE__) . '\'; "></div>';
+        ?>
                                                             <div class="input-group">
                                                                 <span class="input-group-btn" style="float:left;">
                                                                     <input id="upload_image_button" class="btn btn-primary" type="button" value="Browse" />
@@ -552,35 +646,26 @@ function test_init() {
                                                                 } else {
                                                                     ?>
                                                                     <button  name="notify_save" type="submit" class="btn btn-success">Save</button>
-                                                                <?php } ?>
+        <?php } ?>
                                                                 <button data-reveal-id="myModal" type="button" class="btn btn-primary">Preview</button>
                                                                 <span id="img-msg" style="display:none;margin-top: 7px;color: #f00;"> Don't forget to press update button to save image.</span>
                                                             </div>
-                                                            <div class="form-group pull-right col-md-5 swith" style="margin-right: 40px;">
-                                                                <div class="onoffdiv">
-                                                                    <label class="pull-left">Turn Popup on:</label>
-                                                                </div>
-                                                                    <div class="radios-wrap">
-                                                                        <label class="pull-left" for="on">Yes</label>
-                                                                        <input class="input-group pull-left" <?php if ($myrows[0]->status == 1) {echo 'checked';} ?> onchange="switchonoff();" type="radio" value="on" name="status" id="on">
-                                                                    </div>
-                                                                    <div class="radios-wrap">
-                                                                        <label class="pull-left" for="off">No</label>
-                                                                        <input class="input-group pull-left" <?php if ($myrows[0]->status == 0) {echo 'checked';} ?> onchange="switchonoff();" type="radio" value="off" name="status" id="off">
-                                                                    </div>
-                                                                <!--div class="switch" id="basic">
-                                                                    <input type="checkbox" id='switchbutton' onchange="switchonoff();" name="status" value="1" <?php
-                                                                    if ($myrows[0]->status == 1) {
-                                                                        echo 'checked';
-                                                                    }
-                                                                    ?>-->
-                                                                </div>
+                                                            <div class="wpfblbox_form-group wpfblbox_switch" style="float: right;">
+        <?php
+        $img = '';
+        if ($myrows[0]->status == 0) {
+            $img = 'off.png';
+        } else {
+            $img = 'on.png';
+        }
+        ?>
+                                                                <img onclick="wpjazzpopup_switchonoff(this)" src="<?php echo plugins_url('/images/' . $img, __FILE__); ?>"> 
                                                             </div>
                                                         </div>
                                                     </div>
-                                            <?php }if ($_REQUEST['notify'] == 'video') {
-                                                ?>
-                                                <form method="post" action=""  enctype="multipart/form-data">  
+                                                </div>
+    <?php }if ($_REQUEST['notify'] == 'video') {
+        ?>
                                                     <div class="panel panel-default">
                                                         <div class="panel-heading">
                                                             <h3 class="panel-title">Add video embed code</h3>
@@ -597,84 +682,110 @@ function test_init() {
                                                                     ?>
                                                                     <input type="hidden" name="update_id" value="<?php echo @$myrows[0]->id; ?>">
                                                                     <button  name="notify_update" type="submit" class="btn btn-success">Update</button>
-                                                                    <?php
-                                                                } else {
-                                                                    ?>
+            <?php
+        } else {
+            ?>
                                                                     <button  name="notify_save" type="submit" class="btn btn-success">Save</button>
                                                                 <?php } ?>
                                                                 <button data-reveal-id="myModal" type="button"  class="btn btn-primary">Preview</button>
                                                             </div>
-                                                                <div class="form-group pull-right col-md-5 swith">
-                                                                <div class="onoffdiv">
-                                                                    <label class="pull-left">Turn Popup on:</label>
-                                                                </div>
-                                                                    <div class="radios-wrap">
-                                                                        <label class="pull-left" for="on">Yes</label>
-                                                                        <input class="input-group pull-left" <?php if ($myrows[0]->status == 1) {echo 'checked';} ?> onchange="switchonoff();" type="radio" value="on" name="status" id="on">
-                                                                    </div>
-                                                                    <div class="radios-wrap">
-                                                                        <label class="pull-left" for="off">No</label>
-                                                                        <input class="input-group pull-left" <?php if ($myrows[0]->status == 0) {echo 'checked';} ?> onchange="switchonoff();" type="radio" value="off" name="status" id="off">
-                                                                    </div>
-                                                                <!--div class="switch" id="basic">
-                                                                    <input type="checkbox" id='switchbutton' onchange="switchonoff();" name="status" value="1" <?php
-                                                                    if ($myrows[0]->status == 1) {
-                                                                        echo 'checked';
-                                                                    }
-                                                                    ?>-->
+
+
+                                                            <div class="wpfblbox_form-group wpfblbox_switch" style="float: right;">
+        <?php
+        $img = '';
+        if ($myrows[0]->status == 0) {
+            $img = 'off.png';
+        } else {
+            $img = 'on.png';
+        }
+        ?>
+                                                                <img onclick="wpjazzpopup_switchonoff(this)" src="<?php echo plugins_url('/images/' . $img, __FILE__); ?>"> 
                                                             </div>
+
+
                                                         </div>
 
                                                     </div>
                                                 <?php }
                                                 ?>
-                                                <?php
-                                                $notify = '';
-                                                if (isset($_REQUEST['notify'])) {
-                                                    $notify = $_REQUEST['notify'];
-                                                } else {
-                                                    $notify = $myrows[0]->radio_value;
-                                                }
-                                                ?>
+    <?php
+    $notify = '';
+    if (isset($_REQUEST['notify'])) {
+        $notify = $_REQUEST['notify'];
+    } else {
+        $notify = $myrows[0]->radio_value;
+    }
+    ?>
                                                 <input type="hidden" name="notify" value="<?php echo $notify; ?>">
+                                                If you enjoy our plugin, please give it 5 stars. [<a href="https://wordpress.org/plugins/jazz-popups/" target="_blank">Rate the plugin</a>]
                                                 <div class="clearfix"></div>
                                                 </div>
                                                 </div>
                                                 </div>
                                                 <div class="col">
+                                                    <div class="where" style="margin-bottom:7px;">
+                                                        <a href="https://www.2checkout.com/checkout/purchase?sid=102444448&quantity=1&product_id=1">
+                                                            <img style="width:100%;" src="<?php echo plugins_url('/images/donate.jpg', __FILE__); ?>"> 
+                                                        </a>
+                                                    </div>
                                                     <div class="where">
-                                                        <form class="inline-form form-inline">
                                                             <div class="control-group">
                                                                 <label class="control-label">Settings</label>
-                                                                <div class="field-wrap">
-                                                                    <label>Where would you like to display: </label>
-                                                                    <div class="form-group">
-                                                                        <select class="form-control" name="display" onchange="if(this.value == 4){jQuery('#page-ids').show(200)}else{jQuery('#page-ids').hide(200)}">
-                                                                            <option value="2" <?php echo @$display[2]; ?>>Homepage</option>
-                                                                            <option value="1" <?php echo @$display[1]; ?>>All other pages except Homepage</option>
-                                                                            <option value="3" <?php echo @$display[3]; ?>>All Pages</option>
-                                                                            <option value="4" <?php echo @$display[4]; ?>>All Pages except followings</option>
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="field-wrap" id="page-ids" style="display:<?php if($myrows[0]->display != 4){echo 'none';} ?>;">
-                                                                    <label style="width:280px;">add page/post ids seperated by comma.</label>
-                                                                    <div class="form-group">
-                                                                        <input type="text" name="except_ids" value="<?php echo $myrows[0]->except_ids; ?>" class="form-control">
-                                                                    </div>
-                                                                    <label class="small" style="margin-top: -6px;font-size: 10px;margin-left: 8px;"> Example: 1,9,14 </label>
-                                                                </div>
+                                                                
+                                                                
+                                                                <tr>
+                                                <td style="width: 160px; vertical-align: top;text-align: right; padding-right: 15px;">
+                                                    <label style="margin-top:8px;">Where to display? </label>
+                                                </td>
+                                                <td>
+                                                    <div class="wpfblbox_form-group">
+                                                        <input type="checkbox" id="display1" name="display[]" <?php echo @$display['1']; ?> value="1" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display1">Homepage</label>
+                                                        <input type="checkbox" id="display2" name="display[]" <?php echo @$display['2']; ?> value="2" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display2">All pages</label>
+                                                        <input type="checkbox" id="display4" name="display[]" <?php echo @$display['4']; ?> value="4" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display4">All posts</label>
+                                                        <input type="checkbox" id="display8" onchange="if (this.checked) {
+                                                                        jQuery('.wpfblbox_exclude').show(200)
+                                                                    } else {
+                                                                        jQuery('.wpfblbox_exclude').hide(200)
+                                                                    }" name="display[]" <?php echo @$display['8']; ?> value="8" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display8">Exclude following pages and posts</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="vertical-align: top;width: 160px; padding-top: 10px;text-align: right; padding-right: 15px;">
+                                                    <label class="wpfblbox_exclude" style="display:<?php
+                                                    if ($myrows[0]->display & 8) {
+                                                        echo 'block';
+                                                    } else {
+                                                        echo 'none';
+                                                    }
+                                                    ?>">Exclude Page/Post</label>
+                                                </td>
+                                                <td>
+                                                    <div class="wpfblbox_form-group wpfblbox_exclude" style="display:<?php
+                                                    if ($myrows[0]->display & 8) {
+                                                        echo 'block';
+                                                    } else {
+                                                        echo 'none';
+                                                    }
+                                                    ?>">
+                                                        <div id="magicsuggest" value="[<?php echo $myrows[0]->except_ids; ?>]" name="except_ids[]" style="width:auto !important; background: #fff; border: thin solid #cccccc;"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                                                
+                                                                
                                                                 <div class="field-wrap">
                                                                     <label>Logged in or Non Logged in user: </label>
                                                                     <div class="form-group">
                                                                         <select class="form-control" name="user">
-                                                                            <option <?php echo @$user[1]; ?> value="1">Logged In</option>
-                                                                            <option <?php echo @$user[2]; ?> value="2">Non Logged In</option>
-                                                                            <option <?php echo @$user[3]; ?> value="3">Both</option>
+                                                                            <option <?php echo @$user[0]; ?> value="0">Logged In</option>
+                                                                            <option <?php echo @$user[1]; ?> value="1">Non Logged In</option>
+                                                                            <option <?php echo @$user[2]; ?> value="2">Both</option>
                                                                         </select>
                                                                     </div>
                                                                 </div>
-                                                               
+
                                                                 <div class="field-wrap">
 
 
@@ -689,24 +800,25 @@ function test_init() {
                                                                                 <label>Background Color:</label>
                                                                                 <input id="wp-background" name="bg_color" value="<?php echo $myrows[0]->bg_color; ?>" type="color" class="form-control" style="cursor:pointer">
                                                                             </div>
-                                                                             <div class="inner-field">
-                                                                              <label>Popup Width:</label>
-                                                                              <input id="wp-width" name="width" value="<?php echo $myrows[0]->width; ?>" type="text" class="form-control">
-                                                                              </div>
-                                                                              <?php /* ?><div class="inner-field">
-                                                                              <label>Announcement Position:</label>
-                                                                              <select class="form-control" name="position" id="wp-position">
-                                                                              <option <?php echo $position[1]; ?> value="1">Top</option>
-                                                                              <option <?php echo $position[2]; ?> value="2">Bottom</option>
-                                                                              <option <?php echo $position[3]; ?> value="3">Center</option>
-                                                                              </select>
-                                                                              </div> <?php */ ?>
+                                                                            <div class="inner-field">
+                                                                                <label>Popup Width:</label>
+                                                                                <input id="wp-width" name="width" value="<?php echo $myrows[0]->width; ?>" type="text" class="form-control">
+                                                                            </div>
+    <?php /* ?><div class="inner-field">
+      <label>Announcement Position:</label>
+      <select class="form-control" name="position" id="wp-position">
+      <option <?php echo $position[1]; ?> value="1">Top</option>
+      <option <?php echo $position[2]; ?> value="2">Bottom</option>
+      <option <?php echo $position[3]; ?> value="3">Center</option>
+      </select>
+      </div> <?php */ ?>
                                                                         </div>
                                                                     </div>
 
                                                                 </div>
                                                                 <div class="field-wrap">
-                                                                    <label>Animation: </label>
+                                                                    
+                                                                 <label>Animation: </label>
                                                                     <div class="form-group">
                                                                         <select class="form-control" name="animation" id="wp-animation">
                                                                             <option <?php echo @$animation[0]; ?> value="0">None</option>
@@ -717,7 +829,7 @@ function test_init() {
                                                                             <option <?php echo @$animation[5]; ?> value="5">3d unfold</option>
                                                                             <option <?php echo @$animation[6]; ?> value="6">Zoom-out</option>
                                                                         </select>
-                                                                    </div>
+                                                                   </div>
                                                                 </div>
                                                                 <div class="field-wrap">
                                                                     <label>Display for the first time only </label>
@@ -750,7 +862,6 @@ function test_init() {
                                                                     <div class="clearfix"></div>
                                                                 </div>
                                                             </div>
-                                                        </form>
                                                     </div>
                                                 </div>
                                                 <div class="col col-adv">
@@ -817,16 +928,16 @@ function test_init() {
 
                                             add_option('jal_db_version', $jal_db_version);
                                         }
-                                        
-        function jazzpopup_update_db_check() {
-    global $jal_db_version;
-    if (get_site_option('jal_db_version') != $jal_db_version) {
-        jazzpopup_update_db_check();
-    }
-}
+
+                                        function jazzpopup_update_db_check() {
+                                            global $jal_db_version;
+                                            if (get_site_option('jal_db_version') != $jal_db_version) {
+                                                jazzpopup_update_db_check();
+                                            }
+                                        }
 
 //add_action('plugins_loaded', 'jazzpopup_update_db_check');                                
-                                        
+
 
                                         function jal_install_data() {
                                             global $wpdb;
@@ -861,11 +972,11 @@ function test_init() {
                                                     'bg_color' => '#ffffff',
                                                     'width' => 500,
                                                     'position' => 3,
-                                                    'time' => 6000,        
+                                                    'time' => 6000,
                                                     'animation' => 2,
                                                     'when_display' => 0,
                                                     'remove' => 3,
-                                                    'except_ids' => '',        
+                                                    'except_ids' => '',
                                                     'user_id' => $user_id,
                                                     'active' => 1
                                                         )
@@ -899,9 +1010,13 @@ function test_init() {
                                             wp_enqueue_style('css1');
                                             wp_register_style('css2', plugins_url('/jazz-popup/jazz-popup.css', __FILE__));
                                             wp_enqueue_style('css2');
+                                            wp_register_style('wpjazzpopup_magicsuggest-min', plugins_url('/css/magicsuggest-min.css', __FILE__));
+                                            wp_enqueue_style('wpjazzpopup_magicsuggest-min');
                                             wp_enqueue_script('jquery-ui-core', array('jquery'));
                                             wp_enqueue_script('pluginscript1', plugins_url('/jazz-popup/jquery.jazz-popup.js', __FILE__), array('jquery'));
                                             wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
+                                            wp_register_script('wpjazzpopup_magicsuggest', plugins_url('/js/magicsuggest-min.js', __FILE__), array('jquery'));
+                                            wp_enqueue_script('wpjazzpopup_magicsuggest');
                                         }
 
                                         add_action('admin_enqueue_scripts', 'my_enqueue');
@@ -914,4 +1029,4 @@ function test_init() {
                                                 wp_enqueue_script('my-admin-js');
                                             }
                                         }
-?>
+                                        ?>
