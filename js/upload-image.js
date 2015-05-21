@@ -224,7 +224,9 @@ function wpjazzpopup_switchonoff(val) {
                             }}
                     });
                 }
+                jQuery('.mfp-img').css('max-width', tmp_width+'px');
             });
+			
         })
         jQuery(document).ready(function () {
             jQuery('.btn-file :file').on('fileselect', function (event, numFiles, label) {

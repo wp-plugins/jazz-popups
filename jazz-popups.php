@@ -3,7 +3,7 @@
   Plugin Name: Jazz Popups
   Description: Jazz Popups allow you to add special announcement, message or offers in form of text, image and video.
   Author: <a href="http://crudlab.com/">CRUDLab</a>
-  Version: 1.6.6
+  Version: 1.6.8
  */
 require_once( ABSPATH . "wp-includes/pluggable.php" );
 add_action('admin_menu', 'test_plugin_setup_menu');
@@ -55,8 +55,8 @@ function test_plugin_setup_menu() {
 add_filter('wp_footer', 'lightbox', 100);
 
 function abwb() {
-    wp_register_style('css2', plugins_url('/jazz-popup/jazz-popup.css', __FILE__));
-    wp_enqueue_style('css2');
+    wp_register_style('jazz_css', plugins_url('/jazz-popup/jazz-popup_new.css', __FILE__));
+    wp_enqueue_style('jazz_css');
     wp_enqueue_script('jquery-ui-core', array('jquery'));
     wp_enqueue_script('pluginscript1', plugins_url('/jazz-popup/jquery.jazz-popup.js', __FILE__), array('jquery'));
     //wp_enqueue_script('pluginscript2', plugins_url('/jazz-popup/jquery.jazz-popup.min.js', __FILE__), array('jquery'));
@@ -130,8 +130,12 @@ function lightbox() {
         if ($myrows[0]->remove == 2 || $myrows[0]->remove == 3) {
             $remove = 'true';
         }
+		$padding = '';
+		if($type == 'image' || $type == 2){
+			$padding = 'padding:0 !important;';
+		}
 
-        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="background:' . $background . '; max-width:' . $width . '">' . $data . '<img class="jazzclosebutton" src="' . plugins_url("/images/crox.png", __FILE__) . '" onclick="jQuery.jazzPopup.close();"></div>';
+        $lightbox = '<div id="test-popup" class="white-popup mfp-with-anim mfp-hide" style="'.$padding.' background:' . $background . '; max-width:' . $width . '">' . $data . '<img class="jazzclosebutton" src="' . plugins_url("/images/crox.png", __FILE__) . '" onclick="jQuery.jazzPopup.close();"></div>';
         if ($type != 'image') {
             $data = '#test-popup';
         }
@@ -376,6 +380,7 @@ if (isset($_REQUEST['notify_update'])) {
     $data = ($_REQUEST['content']);
     $data = stripcslashes($data);
     $table = $wpdb->prefix . 'notify';
+	if($width < 1){$width = 500;}
     $data1 = array(
         'type' => $type,
         'radio_value' => $radio_value,
@@ -718,9 +723,15 @@ function test_init() {
     }
     ?>
                                                 <input type="hidden" name="notify" value="<?php echo $notify; ?>">
-                                                If you enjoy our plugin, please give it 5 stars. [<a href="https://wordpress.org/plugins/jazz-popups/" target="_blank">Rate the plugin</a>]
-                                                <div class="clearfix"></div>
+												<div class="control-group where" style="margin-top:5px;">
+												<ul>
+                                                <li>If you enjoy our plugin, please give it 5 stars. [<a href="https://wordpress.org/plugins/jazz-popups/" target="_blank">Rate the plugin</a>]
+                                                </li><li>
+												If you're having issue, please submit ticket. [<a href="https://crudlab.com/submit-ticket/" target="_blank">Submit Ticket</a>]
+                                                </li></ul>
+												<div class="clearfix"></div>
                                                 </div>
+												</div>
                                                 </div>
                                                 </div>
                                                 <div class="col">
@@ -740,14 +751,14 @@ function test_init() {
                                                 </td>
                                                 <td>
                                                     <div class="wpfblbox_form-group">
-                                                        <input type="checkbox" id="display1" name="display[]" <?php echo @$display['1']; ?> value="1" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display1">Homepage</label>
-                                                        <input type="checkbox" id="display2" name="display[]" <?php echo @$display['2']; ?> value="2" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display2">All pages</label>
-                                                        <input type="checkbox" id="display4" name="display[]" <?php echo @$display['4']; ?> value="4" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display4">All posts</label>
+                                                        <input type="checkbox" id="display1" name="display[]" <?php echo @$display['1']; ?> value="1" class="wpfblbox_form-control wpfblbox_check" style="float:left; margin-top:1px"><label for="display1">Homepage</label>
+                                                        <input type="checkbox" id="display2" name="display[]" <?php echo @$display['2']; ?> value="2" class="wpfblbox_form-control wpfblbox_check" style="float:left; margin-top:1px"><label for="display2">All pages</label>
+                                                        <input type="checkbox" id="display4" name="display[]" <?php echo @$display['4']; ?> value="4" class="wpfblbox_form-control wpfblbox_check" style="float:left; margin-top:1px"><label for="display4">All posts</label>
                                                         <input type="checkbox" id="display8" onchange="if (this.checked) {
                                                                         jQuery('.wpfblbox_exclude').show(200)
                                                                     } else {
                                                                         jQuery('.wpfblbox_exclude').hide(200)
-                                                                    }" name="display[]" <?php echo @$display['8']; ?> value="8" class="wpfblbox_form-control wpfblbox_check" style="float:left"><label for="display8">Exclude following pages and posts</label>
+                                                                    }" name="display[]" <?php echo @$display['8']; ?> value="8" class="wpfblbox_form-control wpfblbox_check" style="float:left; margin-top:1px"><label for="display8">Exclude following pages and posts</label>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -800,10 +811,6 @@ function test_init() {
                                                                                 <label>Background Color:</label>
                                                                                 <input id="wp-background" name="bg_color" value="<?php echo $myrows[0]->bg_color; ?>" type="color" class="form-control" style="cursor:pointer">
                                                                             </div>
-                                                                            <div class="inner-field">
-                                                                                <label>Popup Width:</label>
-                                                                                <input id="wp-width" name="width" value="<?php echo $myrows[0]->width; ?>" type="text" class="form-control">
-                                                                            </div>
     <?php /* ?><div class="inner-field">
       <label>Announcement Position:</label>
       <select class="form-control" name="position" id="wp-position">
@@ -816,7 +823,15 @@ function test_init() {
                                                                     </div>
 
                                                                 </div>
+																
+																
+                                                                            <div class="inner-field">
+                                                                                <label>Popup Width:</label>
+                                                                                <input id="wp-width" name="width" value="<?php echo $myrows[0]->width; ?>" type="text" class="form-control">
+                                                                            </div>
+																
                                                                 <div class="field-wrap">
+																
                                                                     
                                                                  <label>Animation: </label>
                                                                     <div class="form-group">
@@ -1008,8 +1023,8 @@ function test_init() {
                                             //only for our special plugin admin page
                                             wp_register_style('css1', plugins_url('/css/style.css', __FILE__));
                                             wp_enqueue_style('css1');
-                                            wp_register_style('css2', plugins_url('/jazz-popup/jazz-popup.css', __FILE__));
-                                            wp_enqueue_style('css2');
+                                            wp_register_style('jazz_css', plugins_url('/jazz-popup/jazz-popup_new.css', __FILE__));
+                                            wp_enqueue_style('jazz_css');
                                             wp_register_style('wpjazzpopup_magicsuggest-min', plugins_url('/css/magicsuggest-min.css', __FILE__));
                                             wp_enqueue_style('wpjazzpopup_magicsuggest-min');
                                             wp_enqueue_script('jquery-ui-core', array('jquery'));

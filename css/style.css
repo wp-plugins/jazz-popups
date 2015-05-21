@@ -603,3 +603,8 @@ margin-top: 7px;
         width: 100%;
     }
 }
+
+#test-popup > iframe,
+#test-popup > video {
+    max-width: 100%;
+}

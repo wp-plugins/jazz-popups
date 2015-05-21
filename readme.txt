@@ -4,7 +4,7 @@ Donate link: https://www.2checkout.com/checkout/purchase?sid=102444448&quantity=
 Tags: Popups, Pop-ups, welcome message, special message, custom popups, image box, video message, alertbox, alert, offer, offer, announcement, announcement box, alert box, special message, homepage box, help message, guide box, 
 Requires at least: 3.5
 Tested up to: 4.2
-Stable tag: 1.6.6
+Stable tag: 1.6.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,25 +45,29 @@ Jazz Popups allow you to add special announcements, messages, tips, offers on yo
 
 == Frequently Asked Questions ==
 
-= I added image or text or video but it doesn't display?
+= I added image or text or video but it doesn't display? =
 
 Please make sure that you click on update button after adding your content. Also, please make sure pop up is on. 
 
-= What does green and red circle mean?
+= What does green and red circle mean? =
 
 Green means popup is enabled and red means pop up is disabled. 
 
-= How can I change popup color?
+= How can I change popup color? =
 
 Click on Appearance on the right side, it would show color, please select color and don't forget to press update button. 
 
-= Do I need to press update button to see Preview? 
-
+= Do I need to press update button to see Preview? = 
 No, you can see changes in preview without clicking on update button. 
 
-= Can I add custom height width in video embed code? 
 
-It won't work, by default Jazz pop up takes only 480px width for video and adjusts height accordingly. 
+= How do I set video or image width? =
+
+Please enter desired width in width field. It will be applied on your video or image. Please note that embed video width won't work and wil be overridden by our width input. 
+
+= Why desn't Jazz Popup has height input? =
+To maintain image or video quality jazz popup applies height automatically using aspect ratio formula. All you need to do is to enter desired width and height will automatically be calculated. 
+
 
 
 == Screenshots ==
@@ -74,6 +78,11 @@ It won't work, by default Jazz pop up takes only 480px width for video and adjus
 
 
 == Changelog ==
+
+= 1.6.8 =
+
+* Fixed "embed video code" issue.
+* Fixed preview issue
 
 = 1.6.6 = 
 * Improved "where to display" option. 
