@@ -65,7 +65,7 @@ No, you can see changes in preview without clicking on update button.
 
 Please enter desired width in width field. It will be applied on your video or image. Please note that embed video width won't work and wil be overridden by our width input. 
 
-= Why desn't Jazz Popup has height input? =
+= Why doesn't Jazz Popup has height input? =
 To maintain image or video quality jazz popup applies height automatically using aspect ratio formula. All you need to do is to enter desired width and height will automatically be calculated. 
 
 
