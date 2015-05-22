@@ -3,7 +3,7 @@
   Plugin Name: Jazz Popups
   Description: Jazz Popups allow you to add special announcement, message or offers in form of text, image and video.
   Author: <a href="http://crudlab.com/">CRUDLab</a>
-  Version: 1.6.8
+  Version: 1.6.9
  */
 require_once( ABSPATH . "wp-includes/pluggable.php" );
 add_action('admin_menu', 'test_plugin_setup_menu');
@@ -284,16 +284,16 @@ if (isset($_REQUEST['notify_save'])) {
 //    die;
     global $wpdb;
     $type = '';
-    $radio_value = mysql_real_escape_string($_REQUEST['notify']);
+    $radio_value = sanitize_text_field($_REQUEST['notify']);
     $status = 1;
-    $display = mysql_real_escape_string($_REQUEST['display']);
-    $user = mysql_real_escape_string($_REQUEST['user']);
-    $bg_color = mysql_real_escape_string($_REQUEST['bg_color']);
-    $width = mysql_real_escape_string($_REQUEST['width']);
-    $position = mysql_real_escape_string($_REQUEST['position']);
-    $animation = mysql_real_escape_string($_REQUEST['animation']);
-    $when_display = mysql_real_escape_string($_REQUEST['when_display']);
-    $remove = mysql_real_escape_string($_REQUEST['remove']);
+    $display = sanitize_text_field($_REQUEST['display']);
+    $user = sanitize_text_field($_REQUEST['user']);
+    $bg_color = sanitize_text_field($_REQUEST['bg_color']);
+    $width = sanitize_text_field($_REQUEST['width']);
+    $position = sanitize_text_field($_REQUEST['position']);
+    $animation = sanitize_text_field($_REQUEST['animation']);
+    $when_display = sanitize_text_field($_REQUEST['when_display']);
+    $remove = sanitize_text_field($_REQUEST['remove']);
     $ul = '0';
     global $current_user;
     get_currentuserinfo();
@@ -342,22 +342,22 @@ if (isset($_REQUEST['notify_update'])) {
     $display = $_REQUEST['display'];
     $display_val = 0;
     foreach ($display as $d) {
-        $display_val += @mysql_real_escape_string($d);
+        $display_val += @sanitize_text_field($d);
     }
     $except_ids = (isset($_REQUEST['except_ids'])) ? $_REQUEST['except_ids'] : '';
     if ($except_ids != NULL) {
         $except_ids = implode(', ', $except_ids);
     }
-    $radio_value = @mysql_real_escape_string($_REQUEST['notify']);
-    $user = @mysql_real_escape_string($_REQUEST['user']);
-    $bg_color = @mysql_real_escape_string($_REQUEST['bg_color']);
-    $width = @mysql_real_escape_string($_REQUEST['width']);
-    $position = @mysql_real_escape_string($_REQUEST['position']);
-    $animation = @mysql_real_escape_string($_REQUEST['animation']);
-    $when_display = @mysql_real_escape_string($_REQUEST['when_display']);
-    $remove = @mysql_real_escape_string($_REQUEST['remove']);
-    $edit_id = @mysql_real_escape_string($_REQUEST['update_id']);
-    $seconds = @mysql_real_escape_string($_REQUEST['seconds']);
+    $radio_value = @sanitize_text_field($_REQUEST['notify']);
+    $user = @sanitize_text_field($_REQUEST['user']);
+    $bg_color = @sanitize_text_field($_REQUEST['bg_color']);
+    $width = @sanitize_text_field($_REQUEST['width']);
+    $position = @sanitize_text_field($_REQUEST['position']);
+    $animation = @sanitize_text_field($_REQUEST['animation']);
+    $when_display = @sanitize_text_field($_REQUEST['when_display']);
+    $remove = @sanitize_text_field($_REQUEST['remove']);
+    $edit_id = @sanitize_text_field($_REQUEST['update_id']);
+    $seconds = @sanitize_text_field($_REQUEST['seconds']);
     $ul = '0';
     global $current_user;
     get_currentuserinfo();
