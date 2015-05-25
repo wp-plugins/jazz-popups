@@ -4,7 +4,7 @@ Donate link: https://www.2checkout.com/checkout/purchase?sid=102444448&quantity=
 Tags: Popups, Pop-ups, welcome message, special message, custom popups, image box, video message, alertbox, alert, offer, offer, announcement, announcement box, alert box, special message, homepage box, help message, guide box, 
 Requires at least: 3.5
 Tested up to: 4.2
-Stable tag: 1.6.9
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,6 +78,9 @@ To maintain image or video quality jazz popup applies height automatically using
 
 
 == Changelog ==
+
+= 1.7.0 =
+* Fixed some bugs
 
 = 1.6.9 =
 * Fixed some bugs

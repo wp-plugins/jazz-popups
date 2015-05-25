@@ -3,7 +3,7 @@
   Plugin Name: Jazz Popups
   Description: Jazz Popups allow you to add special announcement, message or offers in form of text, image and video.
   Author: <a href="http://crudlab.com/">CRUDLab</a>
-  Version: 1.6.9
+  Version: 1.7.0
  */
 require_once( ABSPATH . "wp-includes/pluggable.php" );
 add_action('admin_menu', 'test_plugin_setup_menu');
@@ -152,7 +152,6 @@ function lightbox() {
         if ($content == NULL) {
             //$str = $lightbox;
         }
-        echo "userrrrrrrrrr".$user;
         if (($user == 0 && is_user_logged_in()) || ($user == 1 && !is_user_logged_in()) || $user == 2) {
             
             if ($display & 2) {
