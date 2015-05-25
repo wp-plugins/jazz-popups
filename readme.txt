@@ -47,7 +47,7 @@ Jazz Popups allow you to add special announcements, messages, tips, offers on yo
 
 = I added image or text or video but it doesn't display? =
 
-Please make sure that you click on update button after adding your content. Also, please make sure pop up is on. 
+Please make sure that you click on update button after adding your content. Also, please make sure pop up is on. Also, please make sure that popup is being displayed for both logged in and non logged in user. Last but not the least please make sure if pop up is display for first time only or all the time. 
 
 = What does green and red circle mean? =
 
